@@ -1,0 +1,12 @@
+package com.arsalan.tenanttable.auth.service;
+
+import com.arsalan.tenanttable.auth.dto.*;
+import com.arsalan.tenanttable.user.entity.User;
+
+public interface IAuthService {
+    UserResponseDto register(RegisterRequestDto dto);
+    AuthResponseDto login(LoginRequestDto dto, ClientInfo clientInfo);
+    AuthResponseDto refreshToken(String token, ClientInfo clientInfo);
+    void logout(String refreshToken);
+    void logoutAll(User user);
+}

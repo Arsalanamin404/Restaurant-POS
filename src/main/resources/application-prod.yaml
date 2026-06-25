@@ -1,0 +1,6 @@
+cookie:
+  secure: true
+
+spring:
+  jpa:
+    show-sql: false
