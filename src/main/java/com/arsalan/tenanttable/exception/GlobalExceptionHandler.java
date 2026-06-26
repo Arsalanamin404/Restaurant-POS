@@ -19,6 +19,20 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(PasswordReuseException.class)
+    public ResponseEntity<ApiResponse<Object>> handlePasswordReuse(
+            PasswordReuseException ex,
+            HttpServletRequest request
+    ) {
+        ApiResponse<Object> response = ApiResponse.failure(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                null,
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(InvalidRefreshTokenException.class)
     public ResponseEntity<ApiResponse<Object>> handleInvalidRefreshToken(
             InvalidRefreshTokenException ex,

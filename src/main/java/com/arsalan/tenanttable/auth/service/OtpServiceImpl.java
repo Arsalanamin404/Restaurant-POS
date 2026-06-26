@@ -66,7 +66,7 @@ public class OtpServiceImpl implements IOtpService{
                             expiryMinutes
                     );
 
-            case PASSWORD_RESET ->
+            case RESET_PASSWORD ->
                     emailService.sendPasswordResetEmail(
                             user.getEmail(),
                             user.getFullName(),

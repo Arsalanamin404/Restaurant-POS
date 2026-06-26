@@ -110,7 +110,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/resend-verification")
+    @PostMapping("/resend-verification-otp")
     public ResponseEntity<ApiResponse<Void>> resendVerificationOtp(
             @Valid @RequestBody ResendOtpRequestDto dto,
             HttpServletRequest request
@@ -225,4 +225,40 @@ public class AuthController {
 
         return ResponseEntity.ok(apiResponse);
     }
+
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequestDto dto,
+            HttpServletRequest request
+    ) {
+        authService.forgotPassword(dto);
+
+        ApiResponse<Void> apiResponse = ApiResponse.success(
+                HttpStatus.OK.value(),
+                "If an account with that email exists, a password reset OTP has been sent",
+                null,
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(
+            @Valid @RequestBody ResetPasswordRequestDto dto,
+            HttpServletRequest request
+    ) {
+        authService.resetPassword(dto);
+
+        ApiResponse<Void> apiResponse = ApiResponse.success(
+                HttpStatus.OK.value(),
+                "Password reset successfully",
+                null,
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
 }

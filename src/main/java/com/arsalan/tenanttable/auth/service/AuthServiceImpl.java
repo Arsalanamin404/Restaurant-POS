@@ -42,7 +42,7 @@ public class AuthServiceImpl implements IAuthService {
             );
         }
 
-        if (userRepository.existsByPhoneNumber(dto.getPhoneNumber())){
+        if (userRepository.existsByPhoneNumber(dto.getPhoneNumber())) {
             throw new ResourceAlreadyExistsException(
                     "User with phone number '" + dto.getPhoneNumber() + "' already exists"
             );
@@ -80,7 +80,7 @@ public class AuthServiceImpl implements IAuthService {
             throw new EmailAlreadyVerifiedException("Email is already verified.");
         }
 
-        otpService.verifyOtp(user,dto.otp(),OtpPurpose.EMAIL_VERIFICATION);
+        otpService.verifyOtp(user, dto.otp(), OtpPurpose.EMAIL_VERIFICATION);
         user.setEmailVerified(true);
 
         userRepository.save(user);
@@ -102,7 +102,7 @@ public class AuthServiceImpl implements IAuthService {
     @Override
     public AuthResponseDto login(LoginRequestDto dto, ClientInfo clientInfo) {
         Authentication authentication = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(dto.getEmail(),dto.getPassword())
+                new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword())
         );
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -115,10 +115,10 @@ public class AuthServiceImpl implements IAuthService {
 
         Map<String, Object> claims = new HashMap<>();
 
-        claims.put("userId",userDetails.getUser().getId().toString());
-        claims.put("role",userDetails.getUser().getRole().name());
+        claims.put("userId", userDetails.getUser().getId().toString());
+        claims.put("role", userDetails.getUser().getRole().name());
 
-        String accessToken = jwtService.generateAccessToken(claims,userDetails);
+        String accessToken = jwtService.generateAccessToken(claims, userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
 
         refreshTokenService.createRefreshToken(
@@ -126,7 +126,7 @@ public class AuthServiceImpl implements IAuthService {
                 refreshToken,
                 clientInfo.ipAddress(),
                 clientInfo.userAgent()
-                );
+        );
 
         return AuthResponseDto
                 .builder()
@@ -177,6 +177,40 @@ public class AuthServiceImpl implements IAuthService {
 
     @Override
     public void logoutAll(User user) {
+        refreshTokenService.revokeAllRefreshTokens(user);
+    }
+
+    @Override
+    @Transactional
+    public void forgotPassword(ForgotPasswordRequestDto dto) {
+        userRepository.findByEmail(dto.email())
+                .ifPresent(user -> {
+                    if (user.isEmailVerified()) {
+                        otpService.generateOtp(user, OtpPurpose.RESET_PASSWORD);
+                    }
+                });
+
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(ResetPasswordRequestDto dto) {
+        User user = userRepository.findByEmail(dto.email())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found")
+                );
+
+        if (!user.isEmailVerified())
+            throw new EmailNotVerifiedException("Please verify your email before resetting your password");
+
+        otpService.verifyOtp(user, dto.otp(), OtpPurpose.RESET_PASSWORD);
+
+        if (passwordEncoder.matches(dto.newPassword(), user.getPassword()))
+            throw new PasswordReuseException("New password must be different from the current password");
+
+        user.setPassword(passwordEncoder.encode(dto.newPassword()));
+        userRepository.save(user);
+
         refreshTokenService.revokeAllRefreshTokens(user);
     }
 }

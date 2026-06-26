@@ -39,9 +39,8 @@ public class SecurityConfig {
                                 "/auth/login",
                                 "/auth/refresh",
                                 "/auth/verify-email",
-                                "/auth/resend-verification",
+                                "/auth/resend-verification-otp",
                                 "/auth/forgot-password",
-                                "/mail-test",
                                 "/auth/reset-password").permitAll()
                         .requestMatchers(
                                 "/swagger-ui/**",

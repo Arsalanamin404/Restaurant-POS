@@ -2,6 +2,6 @@ package com.arsalan.tenanttable.auth.enums;
 
 public enum OtpPurpose {
     EMAIL_VERIFICATION,
-    PASSWORD_RESET,
+    RESET_PASSWORD,
     CHANGE_EMAIL
 }
