@@ -5,6 +5,8 @@ import com.arsalan.tenanttable.user.entity.User;
 
 public interface IAuthService {
     UserResponseDto register(RegisterRequestDto dto);
+    void verifyEmail(VerifyEmailRequestDto dto);
+    void resendVerificationOtp(ResendOtpRequestDto dto);
     AuthResponseDto login(LoginRequestDto dto, ClientInfo clientInfo);
     AuthResponseDto refreshToken(String token, ClientInfo clientInfo);
     void logout(String refreshToken);

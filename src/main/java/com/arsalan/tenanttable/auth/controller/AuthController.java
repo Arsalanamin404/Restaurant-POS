@@ -85,7 +85,7 @@ public class AuthController {
         ApiResponse<UserResponseDto> response =
                 ApiResponse.success(
                         HttpStatus.CREATED.value(),
-                        "User registered successfully",
+                        "Registration successful. Please verify your email",
                         user,
                         request.getRequestURI()
                 );
@@ -93,6 +93,36 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
+    }
+
+    @PostMapping("/verify-email")
+    public ResponseEntity<ApiResponse<Void>> verifyEmail(
+            @Valid @RequestBody VerifyEmailRequestDto dto,
+            HttpServletRequest request
+    ) {
+        authService.verifyEmail(dto);
+        ApiResponse<Void> response = ApiResponse.success(
+                HttpStatus.OK.value(),
+                "Email verified successfully.",
+                null,
+                request.getRequestURI()
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/resend-verification")
+    public ResponseEntity<ApiResponse<Void>> resendVerificationOtp(
+            @Valid @RequestBody ResendOtpRequestDto dto,
+            HttpServletRequest request
+    ) {
+        authService.resendVerificationOtp(dto);
+        ApiResponse<Void> response = ApiResponse.success(
+                HttpStatus.OK.value(),
+                "Verification email sent successfully.",
+                null,
+                request.getRequestURI()
+        );
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")

@@ -2,11 +2,12 @@ package com.arsalan.tenanttable.auth.service;
 
 import com.arsalan.tenanttable.auth.dto.*;
 import com.arsalan.tenanttable.auth.enitity.RefreshToken;
+import com.arsalan.tenanttable.auth.enums.OtpPurpose;
 import com.arsalan.tenanttable.auth.security.CustomUserDetails;
 import com.arsalan.tenanttable.auth.security.jwt.JwtService;
 import com.arsalan.tenanttable.common.enums.Role;
-import com.arsalan.tenanttable.exception.InvalidRefreshTokenException;
-import com.arsalan.tenanttable.exception.ResourceAlreadyExistsException;
+import com.arsalan.tenanttable.exception.*;
+import com.arsalan.tenanttable.mail.IEmailService;
 import com.arsalan.tenanttable.user.entity.User;
 import com.arsalan.tenanttable.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,10 +30,12 @@ public class AuthServiceImpl implements IAuthService {
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
     private final IRefreshTokenService refreshTokenService;
+    private final IOtpService otpService;
+    private final IEmailService emailService;
 
     @Override
+    @Transactional
     public UserResponseDto register(RegisterRequestDto dto) {
-
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new ResourceAlreadyExistsException(
                     "User with email '" + dto.getEmail() + "' already exists"
@@ -54,6 +58,8 @@ public class AuthServiceImpl implements IAuthService {
 
         User savedUser = userRepository.save(user);
 
+        otpService.generateOtp(savedUser, OtpPurpose.EMAIL_VERIFICATION);
+
         return UserResponseDto.builder()
                 .id(savedUser.getId())
                 .fullName(savedUser.getFullName())
@@ -64,12 +70,48 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
+    @Transactional
+    public void verifyEmail(VerifyEmailRequestDto dto) {
+        User user = userRepository.findByEmail(dto.email())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        if (user.isEmailVerified()) {
+            throw new EmailAlreadyVerifiedException("Email is already verified.");
+        }
+
+        otpService.verifyOtp(user,dto.otp(),OtpPurpose.EMAIL_VERIFICATION);
+        user.setEmailVerified(true);
+
+        userRepository.save(user);
+        emailService.sendWelcomeEmail(user.getEmail(), user.getFullName());
+    }
+
+    @Override
+    public void resendVerificationOtp(ResendOtpRequestDto dto) {
+        User user = userRepository.findByEmail(dto.email())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        if (user.isEmailVerified())
+            throw new EmailAlreadyVerifiedException("Email is already verified.");
+
+        otpService.generateOtp(user, OtpPurpose.EMAIL_VERIFICATION);
+    }
+
+    @Override
     public AuthResponseDto login(LoginRequestDto dto, ClientInfo clientInfo) {
         Authentication authentication = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(dto.getEmail(),dto.getPassword())
         );
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        if (!userDetails.getUser().isEmailVerified()) {
+            throw new EmailNotVerifiedException(
+                    "Please verify your email before logging in."
+            );
+        }
 
         Map<String, Object> claims = new HashMap<>();
 

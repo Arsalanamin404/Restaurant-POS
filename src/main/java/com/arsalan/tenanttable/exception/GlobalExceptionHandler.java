@@ -25,12 +25,82 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         ApiResponse<Object> response = ApiResponse.failure(
+                HttpStatus.UNAUTHORIZED.value(),
+                ex.getMessage(),
+                null,
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(EmailAlreadyVerifiedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleEmailAlreadyVerified(
+            EmailAlreadyVerifiedException ex,
+            HttpServletRequest request
+    ) {
+        ApiResponse<Object> response = ApiResponse.failure(
                 HttpStatus.BAD_REQUEST.value(),
                 ex.getMessage(),
                 null,
                 request.getRequestURI()
         );
-        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EmailNotVerifiedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleEmailNotVerified(
+            EmailNotVerifiedException ex,
+            HttpServletRequest request
+    ) {
+        ApiResponse<Object> response = ApiResponse.failure(
+                HttpStatus.UNAUTHORIZED.value(),
+                ex.getMessage(),
+                null,
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(EmailSendingException.class)
+    public ResponseEntity<ApiResponse<Object>> handleEmailSending(
+            EmailSendingException ex,
+            HttpServletRequest request
+    ) {
+        ApiResponse<Object> response = ApiResponse.failure(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                ex.getMessage(),
+                null,
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(OtpAttemptsExceededException.class)
+    public ResponseEntity<ApiResponse<Object>> handleOtpAttemptsExceeded(
+            OtpAttemptsExceededException ex,
+            HttpServletRequest request
+    ) {
+        ApiResponse<Object> response = ApiResponse.failure(
+                HttpStatus.TOO_MANY_REQUESTS.value(),
+                ex.getMessage(),
+                null,
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, HttpStatus.TOO_MANY_REQUESTS);
+    }
+
+    @ExceptionHandler(InvalidOtpException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidOtp(
+            InvalidOtpException ex,
+            HttpServletRequest request
+    ) {
+        ApiResponse<Object> response = ApiResponse.failure(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                null,
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ResourceAlreadyExistsException.class)
