@@ -1,6 +1,7 @@
 package com.arsalan.tenanttable.user.entity;
 
 import com.arsalan.tenanttable.auth.enitity.RefreshToken;
+import com.arsalan.tenanttable.common.enums.PlatformRole;
 import com.arsalan.tenanttable.common.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -39,6 +40,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+    private PlatformRole platformRole;
 
     @Builder.Default
     private boolean emailVerified = false;

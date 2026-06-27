@@ -40,10 +40,12 @@ spring:
             enable: true
 
 
-admin:
-  full_name: ${ADMIN_FULL_NAME}
-  email: ${ADMIN_EMAIL}
-  password: ${ADMIN_PASSWORD}
+platform:
+  admin:
+    name: ${PLATFORM_ADMIN_NAME}
+    email: ${PLATFORM_ADMIN_EMAIL}
+    password: ${PLATFORM_ADMIN_PASSWORD}
+    phone: ${PLATFORM_ADMIN_PHONE}
 
 
 jwt:
