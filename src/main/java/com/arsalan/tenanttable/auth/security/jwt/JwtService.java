@@ -101,7 +101,7 @@ public class JwtService {
 
     public String extractRole(String token) {
         return extractClaims(token,
-                claims -> claims.get("role", String.class));
+                claims -> claims.get("tenantRole", String.class));
     }
 
     public UUID extractUserId(String token) {

@@ -1,6 +1,6 @@
 package com.arsalan.tenanttable.user.dto;
 
-import com.arsalan.tenanttable.common.enums.Role;
+import com.arsalan.tenanttable.common.enums.TenantRole;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,7 +12,7 @@ public class AllUsersResponseDto {
     private UUID id;
     private String fullName;
     private String email;
-    private Role role;
+    private TenantRole tenantRole;
     private String phoneNumber;
 
 }

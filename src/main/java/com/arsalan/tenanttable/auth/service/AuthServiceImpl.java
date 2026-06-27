@@ -5,7 +5,7 @@ import com.arsalan.tenanttable.auth.enitity.RefreshToken;
 import com.arsalan.tenanttable.auth.enums.OtpPurpose;
 import com.arsalan.tenanttable.auth.security.CustomUserDetails;
 import com.arsalan.tenanttable.auth.security.jwt.JwtService;
-import com.arsalan.tenanttable.common.enums.Role;
+import com.arsalan.tenanttable.common.enums.TenantRole;
 import com.arsalan.tenanttable.exception.*;
 import com.arsalan.tenanttable.mail.IEmailService;
 import com.arsalan.tenanttable.user.entity.User;
@@ -53,7 +53,7 @@ public class AuthServiceImpl implements IAuthService {
                 .email(dto.getEmail())
                 .password(passwordEncoder.encode(dto.getPassword()))
                 .phoneNumber(dto.getPhoneNumber())
-                .role(Role.MANAGER)
+                .tenantRole(TenantRole.MANAGER)
                 .build();
 
         User savedUser = userRepository.save(user);
@@ -116,7 +116,7 @@ public class AuthServiceImpl implements IAuthService {
         Map<String, Object> claims = new HashMap<>();
 
         claims.put("userId", userDetails.getUser().getId().toString());
-        claims.put("role", userDetails.getUser().getRole().name());
+        claims.put("tenantRole", userDetails.getUser().getTenantRole().name());
 
         String accessToken = jwtService.generateAccessToken(claims, userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
@@ -152,7 +152,7 @@ public class AuthServiceImpl implements IAuthService {
         Map<String, Object> claims = new HashMap<>();
 
         claims.put("userId", user.getId().toString());
-        claims.put("role", user.getRole().name());
+        claims.put("tenantRole", user.getTenantRole().name());
 
         String newAccessToken = jwtService.generateAccessToken(claims, userDetails);
         String newRefreshToken = jwtService.generateRefreshToken(userDetails);

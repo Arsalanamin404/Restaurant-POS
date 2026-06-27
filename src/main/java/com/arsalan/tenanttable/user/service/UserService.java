@@ -1,7 +1,6 @@
 package com.arsalan.tenanttable.user.service;
 
 import com.arsalan.tenanttable.user.dto.AllUsersResponseDto;
-import com.arsalan.tenanttable.user.entity.User;
 import com.arsalan.tenanttable.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +22,7 @@ public class UserService {
                         .id(user.getId())
                         .fullName(user.getFullName())
                         .email(user.getEmail())
-                        .role(user.getRole())
+                        .tenantRole(user.getTenantRole())
                         .phoneNumber(user.getPhoneNumber())
                         .build())
                 .toList();

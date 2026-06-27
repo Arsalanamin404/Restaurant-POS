@@ -2,7 +2,7 @@ package com.arsalan.tenanttable.user.entity;
 
 import com.arsalan.tenanttable.auth.enitity.RefreshToken;
 import com.arsalan.tenanttable.common.enums.PlatformRole;
-import com.arsalan.tenanttable.common.enums.Role;
+import com.arsalan.tenanttable.common.enums.TenantRole;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -38,8 +38,7 @@ public class User {
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+    private TenantRole tenantRole;
 
     @Enumerated(EnumType.STRING)
     private PlatformRole platformRole;
